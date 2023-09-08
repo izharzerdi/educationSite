@@ -1,0 +1,4 @@
+spring:
+  profiles:
+    active: prod, local
+  project-name: com_its_education

@@ -1,0 +1,72 @@
+server:
+  port: 8081
+  max-http-header-size: 1000KB
+
+flyway.url: jdbc:mysql://DB_HOST:DB_PORT/DB_NAME
+flyway.user: DB_USERNAME
+flyway.password: DB_PASSWORD
+flyway.locations: filesystem:migrations/sql
+
+spring: #Spring Configurations
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false # to prevent exception while serializing empty objects
+  application:
+    name: com-its-education
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        jdbc:
+          time_zone: UTC
+        dialect: com.laerdal.orgmanagement.config.MySqlSpatialCustomDialect          
+    hibernate:
+      use-new-id-generator-mappings: false
+      ddl-auto: validate
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+  datasource: #Datasource Configurations
+    driver-class-name: com.mysql.jdbc.Driver
+    url: ${flyway.url}
+    username: ${flyway.user}
+    password: ${flyway.password}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 20000
+      minimum-idle: 2
+      idle-timeout: 10000
+
+  mvc:
+    throw-exception-if-no-handler-found: false
+
+public:
+  api-endpoints: api-docs,swagger-ui.html,/users/roles
+  folders: swagger-resources,swagger-ui
+logging:
+  path: /tmp/haathi/logs/org-service
+  file: ${logging.path}/org-service-api.log
+
+thread:
+  default:
+    corePool-size: 10
+    max-size: 10
+    scheduler: # scheduler config 
+      pool-size: 10    
+  queueCapacity: 5000
+
+retry:
+  maxAttempts: 2
+  delay: 2000
+  multiplier: 2
+  maxDelay: 9000
+  
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 120000 # 120Sec
+
+
