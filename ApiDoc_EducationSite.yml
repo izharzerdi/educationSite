@@ -1,0 +1,495 @@
+openapi: 3.0.0
+info:
+  title: Education Site API Documentation
+  description: Documentation for students and the courses present in EducationSite
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api/v1 # Replace with your API's base URL
+paths:
+  /courses:
+    get:
+      summary: Get All Courses
+      description: Retrieve a list of all courses configured.
+      tags:
+        - Course Management
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/CoursesResponse'
+    post:
+      summary: Create a Course
+      description: |
+        * Create a new course.
+        * Mandatory fields are : name , code.
+      tags:
+        - Course Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseRequest'
+      responses:
+        '200':
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCourse'
+  /courses/{id}:
+    patch:
+      summary: Update Course by ID
+      tags:
+        - Course Management
+      description: |
+        * Update Course by its ID.
+        * Mandatory fields are : name , code.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the course to update.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateCourse'
+        '404':
+          description: Course Not Found
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ApiResponseNotFound'
+    delete:
+      summary: Delete Course by ID
+      description: Delete Course by its ID.
+      tags:
+        - Course Management
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the course to delete.
+      responses:
+        '204':
+          description: Course deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteCourse'
+        '404':
+          description: Course Not Found
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ApiResponseNotFound'
+
+  /students:
+    get:
+      summary: Get All students
+      description: Retrieve a list of all students registered.
+      tags:
+        - Student Management
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsResponse'
+    post:
+      summary: Add a Student
+      description: |
+        * Register a new student.
+        * Mandatory fields are : fullName , emailAddress, telephoneNumber, address.
+      tags:
+        - Student Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsResponse'
+  /students/{id}:
+    delete:
+      summary: Delete student and its corresponding courses
+      description: Delete student and its corresponding courses.
+      tags:
+        - Student Management
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the Student.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteStudent'
+
+  /students/{id}/courses:
+    get:
+      summary: Get student courses
+      description: Retrieve a list of all courses of a student.
+      tags:
+        - Student Management
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the Student.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentCourseResponse'
+    post:
+      summary: Add courses to Student
+      description: |
+        * Add courses to a student.
+        * Mandatory fields are : course id.
+      tags:
+        - Student Management
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the Student.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseStudent'
+      responses:
+        '200':
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateStudentCourse'
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+      example:
+        id: 1
+        name: Item 1
+        description: Description of Item 1
+
+    CoursesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "200"
+        error:
+          type: object
+          properties: { }
+        data:
+          type: object
+          properties:
+            courses:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: Java
+                  code:
+                    type: string
+                    example: JA
+                  langCode:
+                    type: string
+                    example: EN
+                  langName:
+                    type: string
+                    example: English
+
+    StudentsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "200"
+        error:
+          type: object
+          properties: { }
+        data:
+          type: object
+          properties:
+            students:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  fullName:
+                    type: string
+                    example: Jeff
+                  emailAddress:
+                    type: string
+                    example: jeff@mailinator.com
+                  telephoneNumber:
+                    type: string
+                    example: 123456789
+
+    StudentCourseResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "200"
+        error:
+          type: object
+          properties: { }
+        data:
+          type: object
+          properties:
+            studentId:
+              type: integer
+              example: 1
+            courses:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: Java
+                  code:
+                    type: string
+                    example: JA
+                  langCode:
+                    type: string
+                    example: EN
+                  langName:
+                    type: string
+                    example: English
+
+    CourseRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Java
+        code:
+          type: string
+          example: JA
+        langCode:
+          type: string
+          example: EN
+        langName:
+          type: string
+          example: English
+
+    StudentRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: jeff
+        emailAddress:
+          type: string
+          example: jeff@mailinator.com
+        telephoneNumber:
+          type: string
+          example: 123456789
+        address:
+          type: string
+          example: 1st cross
+
+    CreateCourseStudent:
+      type: object
+      properties:
+        courses:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+
+
+    CreateCourse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 200
+        error:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 123
+            message:
+              type: string
+              example: Successfully created Course
+
+    CreateStudentCourse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 200
+        error:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 123
+            message:
+              type: string
+              example: Courses added Successfully
+
+    CreateStudent:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 200
+        error:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 123
+            message:
+              type: string
+              example: Successfully registered Student
+
+    UpdateCourse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 200
+        error:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 123
+            message:
+              type: string
+              example: Course updated successfully
+
+    DeleteCourse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 200
+        error:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 123
+            message:
+              type: string
+              example: Course deleted successfully
+
+    DeleteStudent:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 200
+        error:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 123
+            message:
+              type: string
+              example: Student deleted successfully
+
+    ApiResponseNotFound:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 404
+        error:
+          $ref: '#/components/schemas/ApiErrorResponseNotFound'
+        data:
+          type: object
+        warning:
+          type: string
+
+    ApiErrorNotFound:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: 404
+        message:
+          type: string
+          example: course not found
+
+    ApiErrorResponseNotFound:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiErrorNotFound'
